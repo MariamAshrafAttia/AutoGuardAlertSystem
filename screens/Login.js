@@ -23,7 +23,7 @@ const Login = ({ navigation }) => {
     console.log('Username:', username);
     console.log('Password:', password);
     setError(''); // Clear previous errors
-
+  
     if (!username || !password) {
       setError('Please enter both email and password');
       console.log('Error: Missing email or password');
@@ -39,14 +39,12 @@ const Login = ({ navigation }) => {
       console.log('Error: Password too short');
       return;
     }
-    // Check mock credentials
     console.log('Checking credentials...');
     console.log('Expected Email:', mockEmail);
     console.log('Expected Password:', mockPassword);
     if (username === mockEmail && password === mockPassword) {
-      console.log('Credentials match! Navigating to Dashboard...');
-      // Temporarily remove Alert to test navigation directly
-      navigation.navigate('Dashboard');
+      console.log('Credentials match! Navigating to MainApp...');
+      navigation.navigate('MainApp'); // Navigate to the nested navigator
     } else {
       setError('Invalid email or password');
       console.log('Error: Invalid email or password');
