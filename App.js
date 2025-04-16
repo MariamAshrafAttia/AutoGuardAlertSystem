@@ -2,13 +2,16 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as Font from 'expo-font';
 import { useState, useEffect } from 'react';
-import { Text, View, Dimensions } from 'react-native';
+import { Text, View, Dimensions, LogBox } from 'react-native';
 import Dashboard from './screens/Dashboard';
 import AlertDetails from './screens/AlertDetails';
 import Logs from './screens/Logs';
 import Settings from './screens/Settings';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
+
+// Ignore specific warnings that might arise from AsyncStorage or navigation
+LogBox.ignoreLogs(['AsyncStorage has been extracted from react-native']);
 
 const Stack = createStackNavigator();
 
@@ -49,7 +52,7 @@ export default function App() {
         setFontsLoaded(true);
       } catch (error) {
         console.log('Font loading error details:', error); // Detailed error log
-        setFontError(error.message);
+        setFontError(error.message || 'Unknown font loading error');
       }
     }
     loadFonts();
@@ -59,7 +62,7 @@ export default function App() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Font Loading Error: {fontError}</Text>
-        <Text>Check assets/fonts/ for missing files or typos.</Text>
+        <Text>Ensure assets/fonts/ contains all .ttf files and restart Metro.</Text>
       </View>
     );
   }

@@ -2,13 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Form from '../components/Form';
 import AlertButton from '../components/AlertButton';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SignIn = ({ navigation }) => {
   const [error, setError] = useState('');
 
-  const handleSubmit = (values) => {
+  const handleSubmit = async (values) => {
     const { email, password } = values;
-    console.log('Submitting:', { email, password }); // Add for debugging
+    console.log('Signing in with:', { email, password }); // Debug log
     if (!email || !password) {
       setError('All fields are required');
       return;
@@ -21,9 +22,23 @@ const SignIn = ({ navigation }) => {
       setError('Password must be at least 6 characters');
       return;
     }
-    setError('');
-    console.log('Navigating to MainApp'); // Add for debugging
-    navigation.navigate('MainApp');
+
+    try {
+      const storedData = await AsyncStorage.getItem(email);
+      if (storedData) {
+        const userData = JSON.parse(storedData);
+        if (userData.password === password) {
+          setError('');
+          console.log('Sign-in successful for:', email); // Debug log
+          navigation.navigate('MainApp');
+          return;
+        }
+      }
+      setError('Invalid email or password');
+    } catch (error) {
+      setError('Failed to verify credentials');
+      console.log('Sign-in error:', error);
+    }
   };
 
   return (
