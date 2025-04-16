@@ -1,6 +1,6 @@
 // screens/Logs.js
 import React from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import AlertButton from '../components/AlertButton';
 
 const Logs = ({ navigation }) => {
@@ -38,13 +38,14 @@ const Logs = ({ navigation }) => {
   );
 };
 
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#ECEFF1' },
-  header: { fontSize: 24, fontFamily: 'Montserrat-Bold', color: '#1B3C87', marginBottom: 20 },
-  logItem: { padding: 10, borderBottomWidth: 1, borderBottomColor: '#1B3C87' },
-  detail: { fontSize: 16, fontFamily: 'Roboto-Regular', color: '#1B3C87', marginBottom: 5 },
-  severity: { fontSize: 14, fontFamily: 'Roboto-Regular' },
-  navButton: { backgroundColor: '#1B3C87' },
+  container: { flex: 1, padding: width > 400 ? 30 : 20, backgroundColor: '#ECEFF1' },
+  header: { fontSize: width > 400 ? 26 : 24, fontFamily: 'Montserrat-Bold', color: '#1B3C87', marginBottom: width > 400 ? 25 : 20, textAlign: 'center' },
+  logItem: { padding: width > 400 ? 15 : 10, borderBottomWidth: 1, borderBottomColor: '#1B3C87', width: width > 400 ? '80%' : '90%', alignSelf: 'center' },
+  detail: { fontSize: width > 400 ? 18 : 16, fontFamily: 'Roboto-Regular', color: '#1B3C87', marginBottom: 5 },
+  severity: { fontSize: width > 400 ? 16 : 14, fontFamily: 'Roboto-Regular' },
+  navButton: {},
 });
 
 export default Logs;

@@ -2,45 +2,30 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import * as Font from 'expo-font';
 import { useState, useEffect } from 'react';
-import { Text, View } from 'react-native';
-import Login from './screens/Login';
+import { Text, View, Dimensions } from 'react-native';
 import Dashboard from './screens/Dashboard';
 import AlertDetails from './screens/AlertDetails';
 import Logs from './screens/Logs';
 import Settings from './screens/Settings';
+import SignIn from './screens/SignIn';
+import SignUp from './screens/SignUp';
 
 const Stack = createStackNavigator();
 
-// Nested Navigator for the main app screens (Dashboard, AlertDetails, Logs, Settings)
 const MainAppNavigator = () => {
   return (
-    <Stack.Navigator>
-      {/* Group for Dashboard-related screens */}
-      <Stack.Group screenOptions={{ headerStyle: { backgroundColor: '#1B3C87' }, headerTintColor: '#FFFFFF' }}>
-        <Stack.Screen
-          name="Dashboard"
-          component={Dashboard}
-          options={{ title: 'IDS Dashboard' }}
-        />
-        <Stack.Screen
-          name="AlertDetails"
-          component={AlertDetails}
-          options={{ title: 'Alert Details' }}
-        />
+    <Stack.Navigator
+      screenOptions={{
+        cardStyleInterpolator: ({ current }) => ({ cardStyle: { opacity: current.progress } }),
+      }}
+    >
+      <Stack.Group screenOptions={{ headerStyle: { backgroundColor: '#1B3C87' }, headerTintColor: '#FFFFFF', headerBackTitleVisible: false }}>
+        <Stack.Screen name="Dashboard" component={Dashboard} options={{ title: 'IDS Dashboard' }} />
+        <Stack.Screen name="AlertDetails" component={AlertDetails} options={{ title: 'Alert Details' }} />
       </Stack.Group>
-
-      {/* Group for utility screens (Logs, Settings) */}
-      <Stack.Group screenOptions={{ headerStyle: { backgroundColor: '#4CAF50' }, headerTintColor: '#FFFFFF' }}>
-        <Stack.Screen
-          name="Logs"
-          component={Logs}
-          options={{ title: 'Attack Logs' }}
-        />
-        <Stack.Screen
-          name="Settings"
-          component={Settings}
-          options={{ title: 'Settings' }}
-        />
+      <Stack.Group screenOptions={{ headerStyle: { backgroundColor: '#4CAF50' }, headerTintColor: '#FFFFFF', headerBackTitleVisible: false }}>
+        <Stack.Screen name="Logs" component={Logs} options={{ title: 'Attack Logs' }} />
+        <Stack.Screen name="Settings" component={Settings} options={{ title: 'Settings' }} />
       </Stack.Group>
     </Stack.Navigator>
   );
@@ -53,14 +38,17 @@ export default function App() {
   useEffect(() => {
     async function loadFonts() {
       try {
+        console.log('Loading fonts...'); // Debug log
         await Font.loadAsync({
           'Montserrat-Bold': require('./assets/fonts/Montserrat-Bold.ttf'),
           'Montserrat-Regular': require('./assets/fonts/Montserrat-Regular.ttf'),
           'Roboto-Regular': require('./assets/fonts/Roboto-Regular.ttf'),
           'Roboto-Bold': require('./assets/fonts/Roboto-Bold.ttf'),
         });
+        console.log('Fonts loaded successfully'); // Debug log
         setFontsLoaded(true);
       } catch (error) {
+        console.log('Font loading error details:', error); // Detailed error log
         setFontError(error.message);
       }
     }
@@ -71,6 +59,7 @@ export default function App() {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Font Loading Error: {fontError}</Text>
+        <Text>Check assets/fonts/ for missing files or typos.</Text>
       </View>
     );
   }
@@ -85,19 +74,10 @@ export default function App() {
 
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Login">
-        {/* Login Screen (outside the nested navigator) */}
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }} // Hide header for Login screen
-        />
-        {/* Nested Navigator for the main app */}
-        <Stack.Screen
-          name="MainApp"
-          component={MainAppNavigator}
-          options={{ headerShown: false }} // Hide header for the nested navigator
-        />
+      <Stack.Navigator initialRouteName="SignIn">
+        <Stack.Screen name="SignIn" component={SignIn} options={{ headerShown: false }} />
+        <Stack.Screen name="SignUp" component={SignUp} options={{ headerShown: false }} />
+        <Stack.Screen name="MainApp" component={MainAppNavigator} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

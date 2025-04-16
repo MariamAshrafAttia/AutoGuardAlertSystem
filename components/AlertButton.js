@@ -1,4 +1,3 @@
-// components/AlertButton.js
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
 
@@ -11,6 +10,9 @@ const AlertButton = ({ title, onPress, style, severity }) => {
     <TouchableOpacity
       style={[styles.button, { backgroundColor: buttonColor }, style]}
       onPress={onPress}
+      activeOpacity={0.7} // Visual feedback on press
+      accessibilityLabel={title}
+      accessibilityRole="button"
     >
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableOpacity>

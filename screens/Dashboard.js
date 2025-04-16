@@ -1,6 +1,5 @@
-// screens/Dashboard.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList } from 'react-native';
+import { View, Text, StyleSheet, FlatList, Dimensions } from 'react-native';
 import AlertButton from '../components/AlertButton';
 
 const Dashboard = ({ navigation }) => {
@@ -38,11 +37,12 @@ const Dashboard = ({ navigation }) => {
   );
 };
 
+const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#ECEFF1' },
-  header: { fontSize: 24, fontFamily: 'Montserrat-Bold', color: '#1B3C87', marginBottom: 10 },
-  subHeader: { fontSize: 18, fontFamily: 'Montserrat-Regular', color: '#1B3C87', marginBottom: 10 },
-  navButton: { backgroundColor: '#1B3C87' },
+  container: { flex: 1, padding: width > 400 ? 30 : 20, backgroundColor: '#ECEFF1' },
+  header: { fontSize: width > 400 ? 24 : 22, fontFamily: 'Montserrat-Bold', color: '#1B3C87', marginBottom: 10 },
+  subHeader: { fontSize: width > 400 ? 18 : 16, fontFamily: 'Montserrat-Regular', color: '#1B3C87', marginBottom: 10 },
+  navButton: {},
 });
 
 export default Dashboard;
