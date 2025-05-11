@@ -1,15 +1,18 @@
+// components/FormInput.js
 import React from 'react';
 import { TextInput, StyleSheet, Dimensions } from 'react-native';
+import { useTheme } from '../ThemeContext';
 
 const FormInput = ({ value, onChangeText, placeholder, secureTextEntry, error }) => {
+  const { isDarkTheme } = useTheme();
   const { width } = Dimensions.get('window');
   return (
     <TextInput
-      style={[styles.input, { width: width > 400 ? '70%' : '80%' }, error && styles.errorInput]}
+      style={[styles.input, { width: width > 400 ? '70%' : '80%' }, error && styles.errorInput, isDarkTheme && styles.darkInput]}
       value={value}
       onChangeText={onChangeText}
       placeholder={placeholder}
-      placeholderTextColor="#888"
+      placeholderTextColor={isDarkTheme ? '#BBBBBB' : '#888'}
       secureTextEntry={secureTextEntry}
       autoCapitalize="none"
     />
@@ -28,6 +31,11 @@ const styles = StyleSheet.create({
     color: '#1B3C87',
     borderWidth: 1,
     borderColor: '#1B3C87',
+  },
+  darkInput: {
+    backgroundColor: '#2A4BA0',
+    color: '#ECEFF1',
+    borderColor: '#ECEFF1',
   },
   errorInput: {
     borderColor: '#F9602E',

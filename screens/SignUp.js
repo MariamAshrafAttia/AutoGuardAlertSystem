@@ -1,10 +1,13 @@
+// screens/SignUp.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Form from '../components/Form';
 import AlertButton from '../components/AlertButton';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { useTheme } from '../ThemeContext';
 
 const SignUp = ({ navigation }) => {
+  const { isDarkTheme } = useTheme();
   const [error, setError] = useState('');
 
   const handleSubmit = async (values) => {
@@ -25,12 +28,11 @@ const SignUp = ({ navigation }) => {
       setError('Password must be at least 6 characters');
       return;
     }
-
+  
     try {
-      // Save user data to AsyncStorage
       const userData = { name, email, password };
-      await AsyncStorage.setItem(email, JSON.stringify(userData));
-      console.log('User signed up:', email); // Debug log
+      await axios.post('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json', userData);
+      console.log('User signed up:', email);
       setError('');
       navigation.navigate('SignIn');
     } catch (error) {
@@ -40,8 +42,8 @@ const SignUp = ({ navigation }) => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.header}>Sign Up</Text>
+    <View style={[styles.container, isDarkTheme && styles.darkContainer]}>
+      <Text style={[styles.header, isDarkTheme && styles.darkHeader]}>Sign Up</Text>
       <Form
         fields={[
           { name: 'name', label: 'Name', placeholder: 'Enter your name', secure: false, error: error.includes('name') },
@@ -64,7 +66,9 @@ const SignUp = ({ navigation }) => {
 const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: { flex: 1, padding: width > 400 ? 30 : 20, backgroundColor: '#ECEFF1', justifyContent: 'center', alignItems: 'center' },
+  darkContainer: { backgroundColor: '#1B3C87' },
   header: { fontSize: width > 400 ? 30 : 28, fontFamily: 'Montserrat-Bold', color: '#1B3C87', textAlign: 'center', marginBottom: width > 400 ? 30 : 20 },
+  darkHeader: { color: '#ECEFF1' },
   navButton: { backgroundColor: '#4CAF50', alignSelf: 'center', marginTop: width > 400 ? 20 : 10 },
 });
 

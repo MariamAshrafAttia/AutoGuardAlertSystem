@@ -1,16 +1,19 @@
+// components/AlertButton.js
 import React from 'react';
 import { TouchableOpacity, Text, StyleSheet } from 'react-native';
+import { useTheme } from '../ThemeContext';
 
 const AlertButton = ({ title, onPress, style, severity }) => {
+  const { isDarkTheme } = useTheme();
   const buttonColor =
     severity === 'high' ? '#F9602E' :
     severity === 'low' ? '#4CAF50' :
-    '#1B3C87';
+    isDarkTheme ? '#2A4BA0' : '#1B3C87'; // Adjust default color based on theme
   return (
     <TouchableOpacity
       style={[styles.button, { backgroundColor: buttonColor }, style]}
       onPress={onPress}
-      activeOpacity={0.7} // Visual feedback on press
+      activeOpacity={0.7}
       accessibilityLabel={title}
       accessibilityRole="button"
     >
