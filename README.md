@@ -6,14 +6,18 @@ Below is the updated README.md content for your AutoGuard Alert System project, 
 AutoGuard Alert System
 
 **Project Idea**
+
 Concept: AutoGuard Alert System is a mobile app designed to monitor and alert users about security threats in connected vehicles, focusing on issues like CAN bus intrusions, unauthorized Wi-Fi access, and GPS spoofing.
+
 **Features:**
 Real-time threat alerts with a user-friendly interface.
 Detailed alert information, historical event logs, and customizable settings (theme, user profile management).
 Secure user authentication with email/password, including signup, sign-in, and password editing capabilities.
 Push notifications for immediate alert awareness.
 Light/dark theme toggle for improved user experience.
+
 **Purpose:**
+
 Deliver real-time security alerts to users.
 Facilitate investigation of alerts and analysis of historical logs.
 Provide user-configurable settings for a personalized experience.
