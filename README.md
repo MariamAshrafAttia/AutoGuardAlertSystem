@@ -1,9 +1,6 @@
 For project demo
 https://drive.google.com/file/d/1kB4S-8Uh3YztUxJZIUQFK9qxRl-QC0LJ/view?usp=sharing
 
-Link for expo Go 
-https://snack.expo.dev/@mariamashrafattia/autoguardalertsystemnav
-
 1. Project Idea
 •	Concept: AutoGuard Alert System is a mobile app for monitoring and alerting users about security threats in connected vehicles, such as CAN bus intrusions, unauthorized Wi-Fi access, and GPS spoofing.
 •	Features: 
