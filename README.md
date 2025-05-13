@@ -23,7 +23,9 @@ Facilitate investigation of alerts and analysis of historical logs.
 Provide user-configurable settings for a personalized experience.
 Target Audience: Vehicle owners, fleet managers, and cybersecurity researchers interested in vehicle security.
 Prototype (Screens and Interactions)
+
 **Screens:**
+
 *SignIn*: Email/password input fields with a toggleable password visibility eye icon, "Sign Up" link, and a login button. Validates credentials against Firebase Realtime Database and navigates to Dashboard on success.
 *SignUp*: Name, email, and password input fields with a toggleable password visibility eye icon, and a signup button. Creates a new user in Firebase and navigates to SignIn.
 *Dashboard*: Displays current alerts in a FlatList, with buttons to navigate to Logs and Settings. Alerts link to AlertDetails when tapped or triggered via notifications. Includes a delete button for each alert.
@@ -33,7 +35,9 @@ Prototype (Screens and Interactions)
 *EditPassword*: Allows users to update their password with current and new password fields (toggleable visibility via eye icon). Validates and updates the password in Firebase, then logs the user out by navigating to SignIn.
 Navigation: Uses @react-navigation/stack for navigation. Flow: SignIn → SignUp (optional) → Dashboard → AlertDetails/Logs/Settings → EditPassword → SignIn (after password update). Notifications can navigate to AlertDetails from anywhere.
 Screenshots: UI elements include headers (Montserrat-Bold), buttons (AlertButton with dynamic colors), lists (FlatList for alerts), and inputs (with eye icons for passwords). Navigation setup is defined in App.js with a Stack.Navigator.
+
 **Project Colors**
+
 Primary: #1B3C87 (deep blue) – Headers, buttons, labels, and default AlertButton color.
 Secondary: #F9602E (orange-red) – Error messages, high-severity alerts, and AlertButton for high-severity alerts.
 Neutral: #ECEFF1 (light gray) – Background for light theme.
@@ -44,20 +48,26 @@ SignIn/SignUp errors in #F9602E.
 Dashboard alerts in #F9602E (high severity) or #4CAF50 (low severity).
 Background switches between #ECEFF1 (light) and #1B3C87 (dark) based on theme.
 Text colors adapt to theme: #1B3C87 (light mode) or #ECEFF1 (dark mode).
+
 **Project Fonts**
+
 Title: Montserrat-Bold – Headers (e.g., "IDS Dashboard").
 Header: Montserrat-Regular – Subheaders (e.g., "Current Alerts").
 Regular: Roboto-Regular – Body text, labels, and input fields.
 Bold: Roboto-Bold – Button text, emphasized text (e.g., AlertButton text).
 Storage: Fonts are stored in assets/fonts/ (e.g., Montserrat-Bold.ttf, Montserrat-Regular.ttf, Roboto-Regular.ttf, Roboto-Bold.ttf).
 Loading: Managed in App.js using expo-font. Displays a "Loading Fonts..." message until fonts are loaded, or an error message if loading fails.
+
 **Custom Buttons**
+
 Component: AlertButton in components/AlertButton.js.
 Features:
 Props: title, onPress, style.
 Dynamic Colors: Uses #1B3C87 for default buttons (e.g., login/signup), #4CAF50 for navigation buttons (e.g., "Back" in Settings).
 Consistent Styling: White text (#FFFFFF), Roboto-Bold font, rounded corners (borderRadius: 5).
+
 **Usage:**
+
 SignIn/SignUp: "Login" and "Sign Up" buttons.
 Dashboard: Navigation buttons for "View Logs" and "Settings".
 AlertDetails/Logs/Settings/EditPassword: "Back" buttons.
