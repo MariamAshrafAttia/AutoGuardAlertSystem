@@ -1,7 +1,6 @@
 For project demo
 https://drive.google.com/file/d/1kB4S-8Uh3YztUxJZIUQFK9qxRl-QC0LJ/view?usp=sharing
 
-Below is the updated README.md content for your AutoGuard Alert System project, formatted as plain text that you can copy and paste directly into your GitHub repository's README file. It reflects the latest updates and follows the structure you provided.
 
 AutoGuard Alert System
 
