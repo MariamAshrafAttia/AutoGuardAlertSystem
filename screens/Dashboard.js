@@ -1,14 +1,14 @@
-// screens/Dashboard.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Dimensions, Button, Alert, TouchableOpacity, Platform } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Dimensions, TouchableOpacity, Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import axios from 'axios';
 import { useTheme } from '../ThemeContext';
+import AlertButton from '../components/AlertButton';
 
 const Dashboard = ({ navigation, route }) => {
   const { isDarkTheme } = useTheme();
   const { userId } = route.params || {};
-  const [alerts, setAlerts] = useState({});
+  const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   console.log('Dashboard - Received userId:', userId);
@@ -18,13 +18,28 @@ const Dashboard = ({ navigation, route }) => {
       try {
         const response = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/alerts.json');
         console.log('Fetched alerts data:', response.data);
-        if (response.data && response.data.alerts) {
-          setAlerts(response.data.alerts);
-        } else if (response.data) {
-          setAlerts(response.data);
+        if (response.data && userId) {
+          const usersResponse = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
+          const users = usersResponse.data;
+          if (users && userId) {
+            const user = Object.values(users).find(u => u.id === userId);
+            if (user && user.APGID) {
+              const alertsArray = Object.entries(response.data)
+                .map(([id, alert]) => ({ id, ...alert }))
+                .filter(alert => alert.APGID === user.APGID);
+              setAlerts(alertsArray);
+              alertsArray.forEach(alert => {
+                sendNotificationForAPGID(alert.APGID, alert.severity, alert.id);
+              });
+            } else {
+              setAlerts([]);
+            }
+          } else {
+            setAlerts([]);
+          }
         } else {
           console.log('No alerts found in Firebase');
-          setAlerts({});
+          setAlerts([]);
         }
         setLoading(false);
       } catch (error) {
@@ -34,36 +49,31 @@ const Dashboard = ({ navigation, route }) => {
     };
 
     fetchAlerts();
-  }, []);
+  }, [userId]);
 
-  useEffect(() => {
-    if (!loading && Object.keys(alerts).length > 0 && Platform.OS !== 'web') {
-      scheduleNotifications(Object.entries(alerts));
-    }
-  }, [alerts, loading]);
-
-  const scheduleNotifications = async (alertEntries) => {
-    const { status } = await Notifications.requestPermissionsAsync();
+  const sendNotificationForAPGID = async (apgId, severity, alertId) => {
+    const { status } = await Notifications.getPermissionsAsync();
     if (status !== 'granted') {
-      Alert.alert('Notification permissions denied!');
+      await Notifications.requestPermissionsAsync();
       return;
     }
 
-    alertEntries.forEach(([alertId, alert], index) => {
-      console.log('Scheduling notification for alertId:', alertId, 'Alert:', alert);
-      const delay = (index + 1) * 3000;
-      setTimeout(async () => {
+    const usersResponse = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
+    const users = usersResponse.data;
+    if (users) {
+      const user = Object.values(users).find(u => u.APGID === apgId);
+      if (user && user.email) {
         await Notifications.scheduleNotificationAsync({
           content: {
             title: 'New Alert!',
-            body: `Message: ${alert.message || 'N/A'}\nSeverity: ${alert.severity || 'N/A'}`,
+            body: `Severity: ${severity || 'N/A'}`,
             data: { alertId, screen: 'AlertDetails' },
-            sound: 'default',
           },
-          trigger: null,
+          trigger: null, // Immediate notification
         });
-      }, delay);
-    });
+        console.log(`Notification sent to ${user.email} for APGID ${apgId} with severity ${severity}`);
+      }
+    }
   };
 
   useEffect(() => {
@@ -77,44 +87,24 @@ const Dashboard = ({ navigation, route }) => {
     return () => subscription.remove();
   }, [navigation]);
 
-  const handleDelete = async (alertId) => {
-    try {
-      console.log('Attempting to delete alert with ID:', alertId);
-      const response = await axios.delete(`https://autoguardalertsystem-default-rtdb.firebaseio.com/alerts/alerts/${alertId}.json`);
-      console.log('Delete response:', response);
-      if (response.status === 200) {
-        setAlerts(prevAlerts => {
-          const newAlerts = { ...prevAlerts };
-          delete newAlerts[alertId];
-          return newAlerts;
-        });
-        Alert.alert('Success', 'Alert deleted');
-      } else {
-        Alert.alert('Error', 'Delete request failed with status: ' + response.status);
-      }
-    } catch (error) {
-      console.log('Error deleting alert:', error.message);
-      Alert.alert('Error', 'Failed to delete alert: ' + error.message);
-    }
-  };
-
-  const renderItem = ({ item, index }) => {
-    console.log('Rendering item:', item, 'Index:', index, 'Alert keys:', Object.keys(alerts));
-    if (!item || typeof item !== 'object' || !item.message || !item.severity) {
+  const renderItem = ({ item }) => {
+    if (!item || !item.channel || !item.severity || !item.averageTime || !item.APGID) {
       return (
         <View style={[styles.alertItem, isDarkTheme && styles.darkAlertItem]}>
-          <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Error: Invalid alert data - {JSON.stringify(item)}</Text>
+          <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Error: Invalid alert data</Text>
         </View>
       );
     }
     return (
-      <View style={[styles.alertItem, isDarkTheme && styles.darkAlertItem]}>
-        <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Message: {item.message}</Text>
+      <TouchableOpacity
+        style={[styles.alertItem, isDarkTheme && styles.darkAlertItem]}
+        onPress={() => navigation.navigate('AlertDetails', { alertId: item.id })}
+      >
+        <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Channel: {item.channel}</Text>
         <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Severity: {item.severity}</Text>
-        <View style={styles.buttonContainer}>
-          <Button title="Delete" onPress={() => handleDelete(Object.keys(alerts)[index])} color="#FF4444" />
-        </View>
-      </View>
+        <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>Average Time: {item.averageTime}</Text>
+        <Text style={[styles.alertText, isDarkTheme && styles.darkAlertText]}>APG ID: {item.APGID}</Text>
+      </TouchableOpacity>
     );
   };
 
@@ -124,18 +114,17 @@ const Dashboard = ({ navigation, route }) => {
     <View style={[styles.container, isDarkTheme && styles.darkContainer]}>
       <Text style={[styles.header, isDarkTheme && styles.darkHeader]}>Dashboard</Text>
       <FlatList
-        data={Object.values(alerts)}
+        data={alerts}
         renderItem={renderItem}
-        keyExtractor={(item, index) => Object.keys(alerts)[index] || `item-${index}`}
+        keyExtractor={(item) => item.id}
         ListEmptyComponent={<Text style={[styles.text, isDarkTheme && styles.darkText]}>No alerts available.</Text>}
       />
       <View style={styles.navContainer}>
-        <TouchableOpacity style={[styles.navButton, { backgroundColor: isDarkTheme ? '#4CAF50' : '#1B3C87' }]} onPress={() => navigation.navigate('Logs')}>
-          <Text style={styles.navButtonText}>View Logs</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={[styles.navButton, { backgroundColor: isDarkTheme ? '#1B3C87' : '#4CAF50' }]} onPress={() => navigation.navigate('Settings', { userId })}>
-          <Text style={styles.navButtonText}>Settings</Text>
-        </TouchableOpacity>
+        <AlertButton
+          title="Settings"
+          onPress={() => navigation.navigate('Settings', { userId })}
+          style={[styles.navButton, { backgroundColor: isDarkTheme ? '#1B3C87' : '#4CAF50' }]}
+        />
       </View>
     </View>
   );
@@ -151,12 +140,11 @@ const styles = StyleSheet.create({
   darkAlertItem: { borderColor: '#ECEFF1' },
   alertText: { fontSize: 16, color: '#333' },
   darkAlertText: { color: '#ECEFF1' },
-  buttonContainer: { flexDirection: 'row', justifyContent: 'flex-end', marginTop: 10 },
   loading: { fontSize: 18, color: '#1B3C87' },
   darkLoading: { color: '#ECEFF1' },
   text: { fontSize: 16, color: '#333' },
   darkText: { color: '#ECEFF1' },
-  navContainer: { flexDirection: 'row', justifyContent: 'space-around', width: '80%', marginTop: 20 },
+  navContainer: { flexDirection: 'row', justifyContent: 'center', width: '80%', marginTop: 20 },
   navButton: { padding: 10, borderRadius: 5, alignItems: 'center', width: '45%' },
   navButtonText: { color: '#FFFFFF', fontSize: 16, fontWeight: 'bold' },
 });

@@ -6,11 +6,14 @@ import { Text, View, Dimensions, LogBox } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import Dashboard from './screens/Dashboard';
 import AlertDetails from './screens/AlertDetails';
-import Logs from './screens/Logs';
 import Settings from './screens/Settings';
 import SignIn from './screens/SignIn';
 import SignUp from './screens/SignUp';
 import EditPassword from './screens/EditPassword';
+import AdminPanel from './screens/AdminPanel';
+import RequestsReview from './screens/RequestsReview';
+import Logs from './screens/Logs';
+import SystemUsers from './screens/SystemUsers';
 import { ThemeProvider, useTheme } from './ThemeContext';
 
 // Ignore specific warnings
@@ -55,13 +58,32 @@ const MainAppNavigator = ({ route }) => {
           component={AlertDetails}
           options={{ title: 'Alert Details' }}
         />
-      </Stack.Group>
-      <Stack.Group>
+        <Stack.Screen
+          name="AdminPanel"
+          component={AdminPanel}
+          options={{ title: 'Admin Panel' }}
+          initialParams={{ userId }}
+        />
+        <Stack.Screen
+          name="RequestsReview"
+          component={RequestsReview}
+          options={{ title: 'Requests Review' }}
+          initialParams={{ userId }}
+        />
         <Stack.Screen
           name="Logs"
           component={Logs}
-          options={{ title: 'Attack Logs' }}
+          options={{ title: 'Logs' }}
+          initialParams={{ userId }}
         />
+        <Stack.Screen
+          name="SystemUsers"
+          component={SystemUsers}
+          options={{ title: 'System Users' }}
+          initialParams={{ userId }}
+        />
+      </Stack.Group>
+      <Stack.Group>
         <Stack.Screen
           name="Settings"
           component={Settings}

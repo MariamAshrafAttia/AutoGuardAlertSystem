@@ -33,9 +33,18 @@ const SignIn = ({ navigation }) => {
         const userEntry = Object.entries(response.data).find(([id, user]) => user.email === email && user.password === password);
         if (userEntry) {
           const userId = userEntry[0];
-          console.log('Found user ID:', userId);
-          navigation.navigate('MainApp', { screen: 'Dashboard', params: { userId } });
-          return;
+          const user = userEntry[1];
+          console.log('Found user ID:', userId, 'Status:', user.status);
+          if (user.status === 'pending') {
+            setError(`Hello ${user.name}, you are pending now. Please contact with vendor.`);
+            return;
+          } else if (user.status === 'accepted') {
+            navigation.navigate('MainApp', { screen: 'Dashboard', params: { userId } });
+            return;
+          } else if (user.status === 'admin') {
+            navigation.navigate('MainApp', { screen: 'AdminPanel', params: { userId } });
+            return;
+          }
         }
       }
       setError('Invalid email or password');

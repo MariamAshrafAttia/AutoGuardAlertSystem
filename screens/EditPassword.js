@@ -1,20 +1,18 @@
-// screens/EditPassword.js
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions, Alert } from 'react-native';
+import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Form from '../components/Form';
 import AlertButton from '../components/AlertButton';
 import axios from 'axios';
 import { useTheme } from '../ThemeContext';
 
-const EditPassword = ({ navigation, route }) => {
+const EditPassword = ({ route, navigation }) => {
   const { isDarkTheme } = useTheme();
+  const { userId } = route.params || {};
   const [error, setError] = useState('');
-  const { userId } = route.params;
 
   const handleSubmit = async (values) => {
-    const { currentPassword, newPassword } = values;
-    console.log('Attempting to update password with:', { currentPassword, newPassword, userId });
-    if (!currentPassword || !newPassword) {
+    const { currentPassword, newPassword, confirmPassword } = values;
+    if (!currentPassword || !newPassword || !confirmPassword) {
       setError('All fields are required');
       return;
     }
@@ -22,39 +20,41 @@ const EditPassword = ({ navigation, route }) => {
       setError('New password must be at least 6 characters');
       return;
     }
+    if (newPassword !== confirmPassword) {
+      setError('New password and confirm password do not match');
+      return;
+    }
 
     try {
-      // Fetch current user data to verify password
-      const response = await axios.get(`https://autoguardalertsystem-default-rtdb.firebaseio.com/users/${userId}.json`);
-      const userData = response.data;
-      console.log('Fetched user data:', userData);
-      if (userData.password !== currentPassword) {
-        setError('Current password is incorrect');
-        return;
-      }
-
-      // Update password
-      const updateResponse = await axios.put(`https://autoguardalertsystem-default-rtdb.firebaseio.com/users/${userId}.json`, {
-        ...userData,
-        password: newPassword,
-      });
-      console.log('Update response:', updateResponse.data);
-
-      // Check if the update was successful
-      if (updateResponse.status === 200) {
+      const response = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
+      const users = response.data;
+      if (users && userId) {
+        const user = Object.values(users).find(u => u.id === userId || Object.keys(users).find(key => key === userId && users[key].password === currentPassword));
+        if (!user || user.password !== currentPassword) {
+          setError('Current password is incorrect');
+          return;
+        }
+        await axios.patch(`https://autoguardalertsystem-default-rtdb.firebaseio.com/users/${userId}.json`, { password: newPassword });
+        console.log('Password updated for userId:', userId);
         setError('');
-        Alert.alert('Success', 'Password updated successfully. You will be logged out.');
-        // Reset navigation stack and navigate to SignIn
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'SignIn' }],
-        });
+        // Redirect to SignIn page after successful password update
+        navigation.navigate('SignIn');
       } else {
-        setError('Failed to update password');
+        setError('User not found');
       }
     } catch (error) {
-      setError('Failed to update password');
-      console.log('Password update error:', error.message);
+      console.log('EditPassword error details:', error.response ? error.response.data : error.message);
+      if (error.response) {
+        if (error.response.status === 403) {
+          setError('Permission denied. Check Firebase database rules.');
+        } else {
+          setError(`Failed to update password: ${error.response.data?.error || 'Unknown error'}`);
+        }
+      } else if (error.request) {
+        setError('No response from server. Check your network connection.');
+      } else {
+        setError(`Failed to update password: ${error.message}`);
+      }
     }
   };
 
@@ -65,6 +65,7 @@ const EditPassword = ({ navigation, route }) => {
         fields={[
           { name: 'currentPassword', label: 'Current Password', placeholder: 'Enter current password', secure: true, error: error.includes('current') },
           { name: 'newPassword', label: 'New Password', placeholder: 'Enter new password', secure: true, error: error.includes('new') },
+          { name: 'confirmPassword', label: 'Confirm Password', placeholder: 'Confirm new password', secure: true, error: error.includes('match') },
         ]}
         onSubmit={handleSubmit}
         error={error}

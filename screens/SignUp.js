@@ -1,4 +1,3 @@
-// screens/SignUp.js
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Dimensions } from 'react-native';
 import Form from '../components/Form';
@@ -11,8 +10,8 @@ const SignUp = ({ navigation }) => {
   const [error, setError] = useState('');
 
   const handleSubmit = async (values) => {
-    const { name, email, password } = values;
-    if (!name || !email || !password) {
+    const { name, email, password, confirmPassword, nationalID, APGID } = values;
+    if (!name || !email || !password || !confirmPassword || !nationalID || !APGID) {
       setError('All fields are required');
       return;
     }
@@ -28,16 +27,58 @@ const SignUp = ({ navigation }) => {
       setError('Password must be at least 6 characters');
       return;
     }
-  
+    if (password !== confirmPassword) {
+      setError('Passwords do not match');
+      return;
+    }
+    if (nationalID.length < 8) {
+      setError('National ID must be at least 8 characters');
+      return;
+    }
+    if (APGID.length < 2) {
+      setError('APG ID must be at least 2 characters');
+      return;
+    }
+
     try {
-      const userData = { name, email, password };
-      await axios.post('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json', userData);
-      console.log('User signed up:', email);
+      // Check if email or APGID already exists
+      const usersResponse = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
+      const users = usersResponse.data;
+      if (users) {
+        if (Object.values(users).some(user => user.email === email)) {
+          setError('Email already in use');
+          return;
+        }
+        if (Object.values(users).some(user => user.APGID === APGID)) {
+          setError('APG ID already in use');
+          return;
+        }
+      }
+
+      // Determine status based on email domain
+      const status = email.toLowerCase().endsWith('@apg.com') ? 'admin' : 'pending';
+
+      // Prepare user data
+      const userData = { name, email, password, nationalID, APGID, status };
+
+      // Post user data to Firebase
+      const response = await axios.post('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json', userData);
+      console.log('User signed up:', email, 'Firebase userId:', response.data.name, 'Status:', status);
       setError('');
       navigation.navigate('SignIn');
     } catch (error) {
-      setError('Failed to save user data');
-      console.log('SignUp error:', error);
+      console.log('SignUp error details:', error.response ? error.response.data : error.message);
+      if (error.response) {
+        if (error.response.status === 403) {
+          setError('Permission denied. Check Firebase database rules.');
+        } else {
+          setError(`Failed to save user data: ${error.response.data?.error || 'Unknown error'}`);
+        }
+      } else if (error.request) {
+        setError('No response from server. Check your network connection.');
+      } else {
+        setError(`Failed to save user data: ${error.message}`);
+      }
     }
   };
 
@@ -49,6 +90,9 @@ const SignUp = ({ navigation }) => {
           { name: 'name', label: 'Name', placeholder: 'Enter your name', secure: false, error: error.includes('name') },
           { name: 'email', label: 'Email', placeholder: 'Enter your email', secure: false, error: error.includes('email') },
           { name: 'password', label: 'Password', placeholder: 'Enter password', secure: true, error: error.includes('password') },
+          { name: 'confirmPassword', label: 'Confirm Password', placeholder: 'Confirm your password', secure: true, error: error.includes('password') },
+          { name: 'nationalID', label: 'National ID', placeholder: 'Enter your national ID', secure: false, error: error.includes('nationalID') },
+          { name: 'APGID', label: 'APG ID', placeholder: 'Enter your APG ID', secure: false, error: error.includes('APGID') },
         ]}
         onSubmit={handleSubmit}
         error={error}

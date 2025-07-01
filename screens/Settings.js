@@ -1,4 +1,3 @@
-// screens/Settings.js
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Switch, Dimensions } from 'react-native';
 import AlertButton from '../components/AlertButton';
@@ -7,7 +6,13 @@ import { useTheme } from '../ThemeContext';
 
 const Settings = ({ navigation, route }) => {
   const { isDarkTheme, toggleTheme } = useTheme();
-  const [user, setUser] = React.useState({ name: 'Not available', email: 'Not available' });
+  const [user, setUser] = React.useState({ 
+    name: 'Not available', 
+    email: 'Not available', 
+    nationalID: 'Not available', 
+    APGID: 'Not available', 
+    status: 'Not available' 
+  });
   const { userId } = route.params || {};
 
   useEffect(() => {
@@ -21,7 +26,13 @@ const Settings = ({ navigation, route }) => {
         const response = await axios.get(`https://autoguardalertsystem-default-rtdb.firebaseio.com/users/${userId}.json`);
         console.log('Fetched user data in Settings:', response.data);
         if (response.data) {
-          setUser({ name: response.data.name || 'Not available', email: response.data.email || 'Not available' });
+          setUser({ 
+            name: response.data.name || 'Not available', 
+            email: response.data.email || 'Not available',
+            nationalID: response.data.nationalID || 'Not available',
+            APGID: response.data.APGID || 'Not available',
+            status: response.data.status || 'Not available'
+          });
         } else {
           console.log('No user data found for userId:', userId);
         }
@@ -47,6 +58,9 @@ const Settings = ({ navigation, route }) => {
       <View style={styles.userInfo}>
         <Text style={[styles.label, isDarkTheme && styles.darkLabel]}>Name: {user.name}</Text>
         <Text style={[styles.label, isDarkTheme && styles.darkLabel]}>Email: {user.email}</Text>
+        <Text style={[styles.label, isDarkTheme && styles.darkLabel]}>National ID: {user.nationalID}</Text>
+        <Text style={[styles.label, isDarkTheme && styles.darkLabel]}>APG ID: {user.APGID}</Text>
+        <Text style={[styles.label, isDarkTheme && styles.darkLabel]}>Status: {user.status}</Text>
       </View>
       <AlertButton
         title="Edit Password"
