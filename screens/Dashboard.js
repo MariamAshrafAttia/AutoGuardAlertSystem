@@ -121,9 +121,9 @@ const Dashboard = ({ navigation, route }) => {
       />
       <View style={styles.navContainer}>
         <AlertButton
-          title="Settings"
-          onPress={() => navigation.navigate('Settings', { userId })}
-          style={[styles.navButton, { backgroundColor: isDarkTheme ? '#1B3C87' : '#4CAF50' }]}
+  title="Settings"
+  onPress={() => navigation.navigate('Settings', { userId })}
+  style={[styles.navButton, { backgroundColor: isDarkTheme ? '#2A4BA0' : '#4CAF50' }]} // Changed color for dark theme
         />
       </View>
     </View>

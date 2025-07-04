@@ -40,6 +40,12 @@ const SignUp = ({ navigation }) => {
       return;
     }
 
+    // Check if email ends with @apg.com and set error
+    if (email.toLowerCase().endsWith('@apg.com')) {
+      setError('Invalid email format. @apg.com emails are not allowed.');
+      return;
+    }
+
     try {
       // Check if email or APGID already exists
       const usersResponse = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
@@ -55,8 +61,8 @@ const SignUp = ({ navigation }) => {
         }
       }
 
-      // Determine status based on email domain
-      const status = email.toLowerCase().endsWith('@apg.com') ? 'admin' : 'pending';
+      // Determine status (no admin status for @apg.com emails due to earlier check)
+      const status = 'pending';
 
       // Prepare user data
       const userData = { name, email, password, nationalID, APGID, status };
