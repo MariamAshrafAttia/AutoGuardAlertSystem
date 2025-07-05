@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, Dimensions, ScrollView } from 'react-native';
 import Form from '../components/Form';
 import AlertButton from '../components/AlertButton';
 import axios from 'axios';
@@ -40,14 +40,12 @@ const SignUp = ({ navigation }) => {
       return;
     }
 
-    // Check if email ends with @apg.com and set error
     if (email.toLowerCase().endsWith('@apg.com')) {
       setError('Invalid email format. @apg.com emails are not allowed.');
       return;
     }
 
     try {
-      // Check if email or APGID already exists
       const usersResponse = await axios.get('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json');
       const users = usersResponse.data;
       if (users) {
@@ -61,13 +59,9 @@ const SignUp = ({ navigation }) => {
         }
       }
 
-      // Determine status (no admin status for @apg.com emails due to earlier check)
       const status = 'pending';
-
-      // Prepare user data
       const userData = { name, email, password, nationalID, APGID, status };
 
-      // Post user data to Firebase
       const response = await axios.post('https://autoguardalertsystem-default-rtdb.firebaseio.com/users.json', userData);
       console.log('User signed up:', email, 'Firebase userId:', response.data.name, 'Status:', status);
       setError('');
@@ -89,7 +83,10 @@ const SignUp = ({ navigation }) => {
   };
 
   return (
-    <View style={[styles.container, isDarkTheme && styles.darkContainer]}>
+    <ScrollView
+      contentContainerStyle={[styles.container, isDarkTheme && styles.darkContainer]}
+      keyboardShouldPersistTaps="handled"
+    >
       <Text style={[styles.header, isDarkTheme && styles.darkHeader]}>Sign Up</Text>
       <Form
         fields={[
@@ -104,22 +101,47 @@ const SignUp = ({ navigation }) => {
         error={error}
         buttonTitle="Sign Up"
       />
-      <AlertButton
-        title="Go to Sign In"
-        onPress={() => navigation.navigate('SignIn')}
-        style={styles.navButton}
-      />
-    </View>
+      <View style={styles.buttonContainer}>
+        <AlertButton
+          title="Go to Sign In"
+          onPress={() => navigation.navigate('SignIn')}
+          style={styles.navButton}
+        />
+      </View>
+    </ScrollView>
   );
 };
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: width > 400 ? 30 : 20, backgroundColor: '#ECEFF1', justifyContent: 'center', alignItems: 'center' },
+  container: { 
+    flexGrow: 1,
+    backgroundColor: '#ECEFF1',
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 20,
+    justifyContent: 'center'
+  },
   darkContainer: { backgroundColor: '#1B3C87' },
-  header: { fontSize: width > 400 ? 30 : 28, fontFamily: 'Montserrat-Bold', color: '#1B3C87', textAlign: 'center', marginBottom: width > 400 ? 30 : 20 },
+  header: { 
+    fontSize: width > 400 ? 30 : 28, 
+    fontFamily: 'Montserrat-Bold', 
+    color: '#1B3C87', 
+    textAlign: 'center', 
+    marginBottom: 30 
+  },
   darkHeader: { color: '#ECEFF1' },
-  navButton: { backgroundColor: '#4CAF50', alignSelf: 'center', marginTop: width > 400 ? 20 : 10 },
+  buttonContainer: {
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 15
+  },
+  navButton: { 
+    backgroundColor: '#4CAF50',
+    width: width > 400 ? '70%' : '90%',
+    padding: 14,
+    borderRadius: 5,
+  },
 });
 
 export default SignUp;

@@ -1,11 +1,10 @@
-// components/Form.js
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, Dimensions, TouchableOpacity } from 'react-native';
-import Icon from 'react-native-vector-icons/FontAwesome'; // For the eye icon
+import Icon from 'react-native-vector-icons/FontAwesome';
 
 const Form = ({ fields, onSubmit, error, buttonTitle }) => {
   const [values, setValues] = useState({});
-  const [secureStates, setSecureStates] = useState({}); // Track visibility for each secure field
+  const [secureStates, setSecureStates] = useState({});
 
   const handleChange = (name, value) => {
     setValues(prev => ({ ...prev, [name]: value }));
@@ -48,7 +47,10 @@ const Form = ({ fields, onSubmit, error, buttonTitle }) => {
         </View>
       ))}
       {error ? <Text style={styles.errorText}>{error}</Text> : null}
-      <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={handleSubmit}
+      >
         <Text style={styles.buttonText}>{buttonTitle}</Text>
       </TouchableOpacity>
     </View>
@@ -57,16 +59,58 @@ const Form = ({ fields, onSubmit, error, buttonTitle }) => {
 
 const { width } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  formContainer: { width: width > 400 ? '70%' : '80%', alignItems: 'center' },
-  inputContainer: { marginBottom: width > 400 ? 20 : 15, width: '100%' },
-  label: { fontSize: width > 400 ? 18 : 16, fontFamily: 'Roboto-Regular', color: '#1B3C87', marginBottom: 5 },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', borderWidth: 1, borderColor: '#ccc', borderRadius: 5 },
-  input: { flex: 1, padding: 10, fontSize: width > 400 ? 16 : 14, fontFamily: 'Roboto-Regular', color: '#333' },
+  formContainer: { 
+    width: '100%',
+    marginBottom: 10
+  },
+  inputContainer: { 
+    marginBottom: 20, 
+    width: '100%' 
+  },
+  label: { 
+    fontSize: 16, 
+    fontFamily: 'Roboto-Regular', 
+    color: '#1B3C87', 
+    marginBottom: 8 
+  },
+  inputWrapper: { 
+    flexDirection: 'row', 
+    alignItems: 'center', 
+    borderWidth: 1, 
+    borderColor: '#ccc', 
+    borderRadius: 5,
+    width: '100%'
+  },
+  input: { 
+    flex: 1, 
+    padding: 12, 
+    fontSize: 16, 
+    fontFamily: 'Roboto-Regular', 
+    color: '#333',
+    minHeight: 50
+  },
   errorInput: { borderColor: '#FF4444' },
   eyeIcon: { padding: 10 },
-  errorText: { color: '#FF4444', fontSize: width > 400 ? 16 : 14, fontFamily: 'Roboto-Regular', marginBottom: 10 },
-  button: { backgroundColor: '#1B3C87', paddingVertical: 10, paddingHorizontal: 20, borderRadius: 5, marginTop: 10 },
-  buttonText: { color: '#ECEFF1', fontSize: width > 400 ? 18 : 16, fontFamily: 'Roboto-Bold', textAlign: 'center' },
+  errorText: { 
+    color: '#FF4444', 
+    fontSize: 14, 
+    fontFamily: 'Roboto-Regular', 
+    marginBottom: 15,
+    textAlign: 'center'
+  },
+  button: { 
+    backgroundColor: '#1B3C87', 
+    paddingVertical: 14,
+    borderRadius: 5, 
+    marginTop: 10,
+    width: '100%'
+  },
+  buttonText: { 
+    color: '#ECEFF1', 
+    fontSize: 16, 
+    fontFamily: 'Roboto-Bold', 
+    textAlign: 'center' 
+  },
 });
 
 export default Form;

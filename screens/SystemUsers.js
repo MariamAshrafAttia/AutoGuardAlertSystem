@@ -58,6 +58,7 @@ const SystemUsers = ({ route }) => {
         data={users}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
+        contentContainerStyle={styles.listContent}
         ListEmptyComponent={<Text style={[styles.text, isDarkTheme && styles.darkText]}>No users found.</Text>}
       />
     </View>
@@ -66,19 +67,57 @@ const SystemUsers = ({ route }) => {
 
 const { width, height } = Dimensions.get('window');
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: width > 400 ? 30 : 20, backgroundColor: '#ECEFF1', justifyContent: 'center', alignItems: 'center' },
+  container: { 
+    flex: 1, 
+    backgroundColor: '#ECEFF1',
+    width: '100%'
+  },
   darkContainer: { backgroundColor: '#1B3C87' },
-  header: { fontSize: width > 400 ? 30 : 28, fontFamily: 'Montserrat-Bold', color: '#1B3C87', textAlign: 'center', marginBottom: width > 400 ? 30 : 20 },
+  header: { 
+    fontSize: width > 400 ? 30 : 28, 
+    fontFamily: 'Montserrat-Bold', 
+    color: '#1B3C87', 
+    textAlign: 'center', 
+    marginTop: 20,
+    marginBottom: 20
+  },
   darkHeader: { color: '#ECEFF1' },
-  userItem: { padding: 15, borderWidth: 1, borderColor: '#ccc', borderRadius: 5, marginVertical: 10, width: width > 400 ? '70%' : '80%' },
+  listContent: {
+    padding: width > 400 ? 30 : 20,
+    paddingBottom: 40
+  },
+  userItem: { 
+    padding: 15, 
+    borderWidth: 1, 
+    borderColor: '#ccc', 
+    borderRadius: 5, 
+    marginVertical: 10, 
+    width: '100%',
+    maxWidth: 500,
+    alignSelf: 'center'
+  },
   darkUserItem: { borderColor: '#ECEFF1' },
   userText: { fontSize: 16, color: '#333', marginBottom: 5 },
   darkUserText: { color: '#ECEFF1' },
-  loading: { fontSize: 18, color: '#1B3C87' },
+  loading: { 
+    fontSize: 18, 
+    color: '#1B3C87', 
+    textAlign: 'center', 
+    marginTop: 20 
+  },
   darkLoading: { color: '#ECEFF1' },
-  error: { fontSize: 16, color: '#F44336', marginBottom: 10 },
+  error: { 
+    fontSize: 16, 
+    color: '#F44336', 
+    marginBottom: 10, 
+    textAlign: 'center' 
+  },
   darkError: { color: '#FFCDD2' },
-  text: { fontSize: 16, color: '#333' },
+  text: { 
+    fontSize: 16, 
+    color: '#333', 
+    textAlign: 'center' 
+  },
   darkText: { color: '#ECEFF1' },
 });
 
